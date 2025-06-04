@@ -1,40 +1,21 @@
 // src/Home.js
 import React, { useEffect } from "react";
-import { View, Text, Alert, Platform } from "react-native";
+import { View, Text, Alert, Platform, StyleSheet } from "react-native";
 import PushNotification from "react-native-push-notification";
 import messaging from "@react-native-firebase/messaging";
 import firestore from "@react-native-firebase/firestore";
 import DeviceInfo from "react-native-device-info";
 import { requestNotificationPermission } from "./utils";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = () => {
   useEffect(() => {
     async function setupNotifications() {
 
-      const hasPermission = await requestNotificationPermission();
-      if (!hasPermission) {
-        Alert.alert(
-          "Permission needed",
-          "We need notifications to send you updates."
-        );
-        return;
-      }
-
-      if (Platform.OS === "android") {
-        PushNotification.createChannel(
-          {
-            channelId: "fcm_default_channel",
-            channelName: "Default Channel",
-            importance: 4,
-          },
-          created => console.log(`Channel created? ${created}`)
-        );
-      }
-
-      const token = await messaging().getToken();
-      console.log("FCM Token:", token);
-      const deviceId = await DeviceInfo.getUniqueId();
-      console.log("Device ID:", deviceId);
+        const token = await messaging().getToken();
+        console.log("FCM Token:", token);
+        const deviceId = await DeviceInfo.getUniqueId();
+        console.log("Device ID:", deviceId);
 
       try {
         await firestore()
@@ -59,6 +40,28 @@ const Home = () => {
         } catch (err) {
             console.error("Error subscribing to topic:", err);
         }
+
+      const hasPermission = await requestNotificationPermission();
+      if (!hasPermission) {
+        Alert.alert(
+          "Permission needed",
+          "We need notifications to send you updates."
+        );
+        return;
+      }
+
+      if (Platform.OS === "android") {
+        PushNotification.createChannel(
+          {
+            channelId: "fcm_default_channel",
+            channelName: "Default Channel",
+            importance: 4,
+          },
+          created => console.log(`Channel created? ${created}`)
+        );
+      }
+
+
     }
 
     setupNotifications();
@@ -76,20 +79,35 @@ const Home = () => {
   }, []);
 
   return (
+    <SafeAreaView>
     <View
-      style={{
+      style={styles.container}
+    >
+      <Text style={styles.headerText}>
+        Hi My Baby Girl!
+      </Text>
+      <Text style={styles.infoText}>You will recieve love notifications!</Text>
+    </View>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+    container:{
         flex: 1,
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
-      }}
-    >
-      <Text style={{ fontSize: 20, marginBottom: 10 }}>
-        Welcome to GetNotify!
-      </Text>
-      <Text>Please allow notifications to get updates.</Text>
-    </View>
-  );
-};
+    },
+    headerText:{
+        fontSize: 20, 
+        marginBottom: 10,
+        fontWeight:700,
+    },
+    infoText:{
+        fontSize:16,   
+    }
+
+})
 
 export default Home;

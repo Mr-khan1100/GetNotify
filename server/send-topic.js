@@ -35,18 +35,34 @@ async function main() {
     process.exit(1);
   }
 
+    const romanticMessages = [
+    "Woke up wishing you were tangled in my sheets, not just in my thoughts 😘",
+    "If kisses were text messages, you'd have hundreds from me by now 💋",
+    "I don’t need coffee this morning—just the thought of your lips on mine ☕💞",
+    "I swear my pillow still smells like you… or maybe it’s just my imagination going wild 😍",
+    "Every morning, I fall a little harder for you — and sometimes that includes falling into fantasies 😏",
+    "Woke up with your name on my lips and your hands in my dreams 🔥",
+    "You're the reason I smile… and blush… and bite my lip when no one’s looking 😉",
+    "Morning babe 😇 Just thinking about that smirk you give right before you steal a kiss 😚",
+    "Sun’s up… and so are my thoughts about you 🌅😈",
+    "Can we skip to the part where I get to hold you too close and not let go? 🥺❤️",
+  ];
+
   // 3) Build a topic message
-  const now = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
-  const message = {
-    topic: "dailyUpdates",
-    notification: {
-      title: `Good morning! (${now})`,
-      body: "Here’s your automated update 😊",
-    },
-    data: {
-      sentAt: new Date().toISOString(),
-    },
-  };
+  // const now = new Date().toLocaleString("en-IN", { timeZone: "Asia/Kolkata" });
+  const randomIndex = Math.floor(Math.random() * romanticMessages.length);
+    const randomMessage = romanticMessages[randomIndex];
+
+    const message = {
+      topic: "dailyUpdates",
+      notification: {
+        title: "🔥 From your Love ❤️",
+        body: randomMessage,
+      },
+      data: {
+        sentAt: new Date().toISOString(),
+      },
+    };
 
   // 4) Send it
   try {
