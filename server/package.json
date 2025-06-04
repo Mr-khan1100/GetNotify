@@ -1,0 +1,9 @@
+{
+  "name": "notify-server",
+  "version": "1.0.0",
+  "main": "send-via-admin.js",
+  "dependencies": {
+    "firebase-admin": "^13.4.0",
+    "node-fetch": "^3.3.2"
+  }
+}

@@ -18,11 +18,12 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install server dependencies
+        working-directory: ./server
         run: npm ci
 
       - name: Run send-via-admin.js
+        working-directory: ./server
         env:
-          # Pass the base64-encoded Service Account JSON into the runner
           FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
         run: node send-via-admin.js
