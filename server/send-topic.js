@@ -56,7 +56,7 @@ async function main() {
     const message = {
       topic: "dailyUpdates",
       notification: {
-        title: "🔥 From your Love ❤️",
+        title: "🔥 From your Love! Habib ❤️",
         body: randomMessage,
       },
       data: {

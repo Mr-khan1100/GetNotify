@@ -79,16 +79,14 @@ const Home = () => {
   }, []);
 
   return (
-    <SafeAreaView>
     <View
       style={styles.container}
     >
       <Text style={styles.headerText}>
-        Hi My Baby Girl!
+        Hi My Baby Girl! ❤️
       </Text>
-      <Text style={styles.infoText}>You will recieve love notifications!</Text>
+      <Text style={styles.infoText}>You will recieve love notifications! Periodicaly.</Text>
     </View>
-    </SafeAreaView>
   );
 };
 
@@ -98,14 +96,17 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 20,
+
     },
     headerText:{
         fontSize: 20, 
         marginBottom: 10,
         fontWeight:700,
+        color:'black'
     },
     infoText:{
-        fontSize:16,   
+        fontSize:16,  
+        color:'grey' 
     }
 
 })
