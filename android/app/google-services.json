@@ -1,0 +1,31 @@
+
+// google-services.json
+{
+  "project_info": {
+    "project_number": "1081767338818",
+    "project_id": "getnotify-15ef7",
+    "storage_bucket": "getnotify-15ef7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1081767338818:android:a9c823a939a34181859edb",
+        "android_client_info": {
+          "package_name": "com.getnotify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxqDx0FDAqio-Wm0BCw-jWoZk6EKLxCoM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

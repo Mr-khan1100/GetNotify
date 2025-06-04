@@ -12,15 +12,19 @@ import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
 
+import com.dieam.reactnativepushnotification.ReactNativePushNotificationPackage
+
 class MainApplication : Application(), ReactApplication {
 
   override val reactNativeHost: ReactNativeHost =
       object : DefaultReactNativeHost(this) {
-        override fun getPackages(): List<ReactPackage> =
-            PackageList(this).packages.apply {
-              // Packages that cannot be autolinked yet can be added manually here, for example:
-              // add(MyReactNativePackage())
-            }
+        override fun getPackages(): List<ReactPackage> {
+          // ② Grab the auto‐linked packages...
+          val packages = PackageList(this).packages
+          // ③ Then manually add the PushNotification package:
+          packages.add(ReactNativePushNotificationPackage())
+          return packages
+        }
 
         override fun getJSMainModuleName(): String = "index"
 
