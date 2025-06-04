@@ -22,8 +22,8 @@ jobs:
         working-directory: ./server
         run: npm ci
 
-      - name: Run send-via-admin.js
+      - name: Run send-topic.js
         working-directory: ./server
         env:
           FIREBASE_SERVICE_ACCOUNT_BASE64: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BASE64 }}
-        run: node send-via-admin.js
+        run: node send-topic.js
