@@ -1,3 +1,5 @@
+
+//utils.js
 import { PermissionsAndroid, Platform } from "react-native";
 
 export const requestNotificationPermission = async () => {
