@@ -53,15 +53,47 @@ async function main() {
   const randomIndex = Math.floor(Math.random() * healthReminderMessages.length);
     const randomMessage = healthReminderMessages[randomIndex];
 
+    // const message = {
+    //   topic: "dailyUpdates",
+    //   notification: {
+    //     title: "🔥 Your Daily Health Reminder! ❤️",
+    //     body: randomMessage,
+    //   },
+    //   data: {
+    //     sentAt: new Date().toISOString(),
+    //   },
+    // };
     const message = {
       topic: "dailyUpdates",
       notification: {
         title: "🔥 Your Daily Health Reminder! ❤️",
         body: randomMessage,
+        // Add sound parameter for background/killed states
+        sound: "custom_sound"
       },
       data: {
-        sentAt: new Date().toISOString(),
+        title: "🔥 Your Daily Health Reminder! ❤️",
+        body: randomMessage,
+        // Add loop_sound flag for native handling
+        loop_sound: "true",
+        // Add wake_screen flag for device wake-up
+        wake_screen: "true",
+        sentAt: new Date().toISOString()
       },
+      android: {
+        priority: "high", // Critical for background handling
+        notification: {
+          sound: "custom_sound", // Override default sound
+          channel_id: "FIREBASE_RINGTONE_CHANNEL" // Match Android channel
+        }
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: "custom_sound.caf" // For iOS compatibility
+          }
+        }
+      }
     };
 
   // 4) Send it
