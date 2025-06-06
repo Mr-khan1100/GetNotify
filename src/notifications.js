@@ -1,129 +1,82 @@
-//notification.js
+import { NativeModules, Platform, AppState } from 'react-native';
 import PushNotification from 'react-native-push-notification';
 import messaging from '@react-native-firebase/messaging';
 
-
-let isInitialized = false;
+const { ServiceModule } = NativeModules;
+let notificationInitialized = false;
+let unsubscribeOnMessage = null;
 
 export const initNotificationService = async () => {
-  if (isInitialized) return;
+  if (notificationInitialized) return () => {};
   
-  // 1. Configure notification system first
+  // Initialize push notification system
   PushNotification.configure({
-    onRegister: (token) => console.log('TOKEN:', token),
-    onNotification: (notification) => console.log('NOTIFICATION:', notification),
-    permissions: { alert: true, badge: true, sound: true },
-    popInitialNotification: true,
-    requestPermissions: false // We'll handle manually
+    onNotification: notification => {
+      console.log('Notification tapped:', notification);
+      // Stop ringtone when notification tapped
+      if (Platform.OS === 'android' && notification?.userInteraction) {
+        ServiceModule.stopRingtone();
+      }
+      notification.finish(PushNotification?.FetchResult?.NoData);
+    },
+    // Important: Request permissions through FCM instead
+    requestPermissions: false,
   });
 
-  // 2. Create Android channel synchronously
-  if (Platform.OS === 'android') {
-    await new Promise(resolve => {
-      PushNotification.createChannel(
-        {
-          channelId: 'fcm_default_channel',
-          channelName: 'Default Channel',
-          soundName: 'default',
-          importance: 4,
-          vibrate: true,
-        },
-        created => {
-          console.log(`Channel created: ${created}`);
-          resolve();
+  // Handle notifications in foreground state
+  unsubscribeOnMessage = messaging().onMessage(async remoteMessage => {
+    console.log('Foreground FCM message:', remoteMessage);
+    
+    // Start ringtone service for foreground notifications
+    if (Platform.OS === 'android') {
+      ServiceModule.startRingtone();
+      
+      // Show local notification
+      PushNotification.localNotification({
+        channelId: 'FIREBASE_RINGTONE_CHANNEL', // Must match Android channel ID
+        title: remoteMessage.notification?.title,
+        message: remoteMessage.notification?.body,
+        playSound: false, // We handle sound via service
+        vibrate: false, // We handle vibration via service
+        ongoing:true
+      });
+    }
+  });
+
+  // Handle app state changes
+  const handleAppStateChange = (nextAppState) => {
+    if (nextAppState === 'active') {
+      // App came to foreground - check for missed notifications
+      PushNotification.getDeliveredNotifications(notifications => {
+        if (notifications.length > 0) {
+          ServiceModule.startRingtone();
         }
-      );
-    });
-  }
+      });
+    }
+  };
 
-  // 3. Set up Firebase message handlers
-  messaging().onMessage(remoteMessage => {
-    console.log('Foreground FCM:', remoteMessage);
-    PushNotification.localNotification({
-      channelId: 'fcm_default_channel',
-      title: remoteMessage.notification?.title,
-      message: remoteMessage.notification?.body,
-      userInfo: remoteMessage.data,
-    });
-  });
+  const appStateSubscription = AppState.addEventListener(
+    'change',
+    handleAppStateChange
+  );
 
-  messaging().setBackgroundMessageHandler(remoteMessage => {
-    console.log('Background FCM:', remoteMessage);
-    PushNotification.localNotification({
-      channelId: 'fcm_default_channel',
-      title: remoteMessage.data?.title ?? remoteMessage.notification?.title,
-      message: remoteMessage.data?.body ?? remoteMessage.notification?.body,
-      userInfo: remoteMessage.data,
-    });
-  });
+  notificationInitialized = true;
 
-  isInitialized = true;
+  // Return cleanup function
+  return () => {
+    if (unsubscribeOnMessage) unsubscribeOnMessage();
+    appStateSubscription.remove();
+  };
 };
 
-export const getFcmToken = () => messaging().getToken();
-// PushNotification.configure({
-//   onRegister: function (token) {
-//     console.log('TOKEN:', token);
-//   },
-//   onNotification: function (notification) {
-//     console.log('NOTIFICATION:', notification);
-//     // Handle notification click
-//   },
-//   permissions: {
-//     alert: true,
-//     badge: true,
-//     sound: true,
-//   },
-//   popInitialNotification: true,
-//   requestPermissions: true,
-// });
+export const getFcmToken = async () => {
+  return messaging().getToken();
+};
 
-// // Create notification channel (Android)
-// PushNotification.createChannel(
-//   {
-//     channelId: 'fcm_default_channel',
-//     channelName: 'Default Channel',
-//     channelDescription: 'A channel for notifications',
-//     soundName: 'default',
-//     importance: 4, // IMPORTANCE_HIGH
-//     vibrate: true,
-//   },
-//   created => console.log(`Channel created: ${created}`)
-// );
-
-// // Firebase message handlers
-// messaging().onMessage(remoteMessage => {
-//   console.log('Foreground FCM:', remoteMessage);
-  
-//   PushNotification.localNotification({
-//     channelId: 'fcm_default_channel',
-//     title: remoteMessage.notification?.title,
-//     message: remoteMessage.notification?.body,
-//     userInfo: remoteMessage.data,
-//   });
-// });
-
-// messaging().setBackgroundMessageHandler(async remoteMessage => {
-//   console.log('Background FCM:', remoteMessage);
-//   // Show a local notification using the push-notification library
-//   PushNotification.localNotification({
-//     channelId: 'fcm_default_channel',
-//     title: remoteMessage.data?.title ?? remoteMessage.notification?.title,
-//     message: remoteMessage.data?.body ?? remoteMessage.notification?.body,
-//     userInfo: remoteMessage.data,
-//   });
-// });
-
-// Get FCM token
-// export const getFcmToken = async () => {
-//   return await messaging().getToken();
-// };
-
-// Request permissions
-// export const requestNotificationPermission = async () => {
-//     console.log('here')
-//   const authStatus = await messaging().requestPermission();
-//   console.log(authStatus, 'AUTHSTATUS')
-//   return authStatus === messaging.AuthorizationStatus.AUTHORIZED || 
-//          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-// };
+// New function to handle background messages
+export const setupBackgroundHandler = () => {
+  messaging().setBackgroundMessageHandler(async remoteMessage => {
+    console.log('Background FCM message:', remoteMessage);
+    // Background handling is done natively in MyFirebaseMessagingService
+  });
+};

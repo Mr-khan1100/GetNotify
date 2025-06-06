@@ -1,18 +1,31 @@
+//App.tsx
 import { StyleSheet } from 'react-native';
 import React, { useEffect } from 'react';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Home from './src/Home';
-import { initNotificationService } from './src/notifications';
+import { initNotificationService, setupBackgroundHandler } from './src/notifications';
 
 const App = () => {
 
-  useEffect(() => {
-    const initializeApp = async () => {
-      await initNotificationService(); // Initialize before anything else
-    };
-    initializeApp();
-  }, []);
+    useEffect(() => {
+      let unsubscribe: any;
+      
+      // Initialize background handler FIRST
+      setupBackgroundHandler();
+      
+      const initialize = async () => {
+        unsubscribe = await initNotificationService();
+      };
 
+      initialize();
+
+      return () => {
+        if (unsubscribe && typeof unsubscribe === 'function') {
+          unsubscribe();
+        }
+      };
+    }, []);
+    
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.bgColor}>

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">getNotify</string>
+    <string name="default_notification_channel_id">FIREBASE_RINGTONE_CHANNEL</string>
 </resources>
