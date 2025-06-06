@@ -63,35 +63,30 @@ async function main() {
     //     sentAt: new Date().toISOString(),
     //   },
     // };
-   const message = {
-      topic: "dailyUpdates",
+  const message = {
+    topic: "dailyUpdates",
+
+    data: {
+      title: "🔥 Your Daily Health Reminder! ❤️",
+      body: randomMessage,
+      loop_sound: "true",
+      wake_screen: "true",
+      sound: "notification_tone",           // your custom mp3 in res/raw
+      sentAt: new Date().toISOString()
+    },
+
+    // ③ In the "android" block, define exactly how the notification should appear.
+    android: {
+      priority: "high",
       notification: {
-        title: "🔥 Your Daily Health Reminder! ❤️",
-        body: randomMessage
-      },
-      data: {
-        title: "🔥 Your Daily Health Reminder! ❤️",
-        body: randomMessage,
-        loop_sound: "true",
-        wake_screen: "true",
-        sound: "custom_sound", // Moved sound here
-        sentAt: new Date().toISOString()
-      },
-      android: {
-        priority: "high",
-        notification: {
-          sound: "custom_sound",
-          channel_id: "FIREBASE_RINGTONE_CHANNEL"
-        }
-      },
-      apns: {
-        payload: {
-          aps: {
-            sound: "custom_sound.caf"
-          }
-        }
+        title: "🔥 Your Daily Health Reminder! ❤️",  // same as data.title
+        body: randomMessage,                         // same as data.body
+        sound: "notification_tone",                       // must match a raw resource
+        channel_id: "FIREBASE_RINGTONE_CHANNEL",
+        // (optionally) other notification fields, e.g. icon, color, etc.
       }
-    };
+    },
+  };
 
   // 4) Send it
   try {
